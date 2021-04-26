@@ -39,22 +39,18 @@ public class LineController : MonoBehaviour
     {
         line.positionCount=1;
         line.enabled = true;
+        int hitCount = 0;
         Vector3 direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - Camera.main.transform.position - transform.position; 
         RaycastHit2D hit= Physics2D.Raycast(transform.position, direction , Mathf.Infinity, ~ignoreMask);
-        line.SetPosition(0, transform.position);
-        if (hit)
+        RaycastHit2D previousHit = hit;
+        line.SetPosition(hitCount, transform.position);
+        /*if (hit)
         {
             line.positionCount++;
             line.SetPosition(1, hit.point);
             direction = Vector2.Reflect(direction, hit.normal);
             Debug.Log(direction);
-            hit = Physics2D.Raycast(hit.point, direction, Mathf.Infinity, ~ignoreMask);
-            if (hit)
-            {
-                line.positionCount++;
-                line.SetPosition(2, hit.point);
-            }
-            /*for (int i = 2; i < 4; i++)
+            for (int i = 2; i < 4; i++)
             {
                 direction = Vector2.Reflect(direction, hit.normal);
                 hit = Physics2D.Raycast(transform.position, direction, Mathf.Infinity, ~ignoreMask);
@@ -64,9 +60,24 @@ public class LineController : MonoBehaviour
                     line.SetPosition(i, hit.point);
                 }
                 else return;
-            }*/
+            }
         }
-        
+        else
+        {
+            line.positionCount++;
+            line.SetPosition(1, Camera.main.ScreenToWorldPoint(Input.mousePosition) - Camera.main.transform.position);
+        }*/
+        while (hit)
+        {
+            line.positionCount++;
+            hitCount++;
+            Debug.Log(hit.point + " hit count is:" + hitCount);
+            line.SetPosition(hitCount, hit.point);
+            direction = Vector2.Reflect(direction, hit.normal);
+            previousHit = hit;
+            hit = Physics2D.Raycast(hit.point + (Vector2)direction*0.0001f, direction, Mathf.Infinity, ~ignoreMask);
+            if (hitCount == 3 ) return;
+        }
     }
     void PlayerInput()
     {
